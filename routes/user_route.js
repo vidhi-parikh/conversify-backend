@@ -1,109 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
-const { Schema } = require("mongoose");
-const User = require("../models/user");
+const {
+  registerUser,
+  loginUser,
+  searchUser,
+} = require("../controllers/userControllers");
+const authUser = require("../middleware/authentication");
 
-router.post("/login", async (req, res) => {
-  let { email, password } = req.body;
+router.post("/sign-up", registerUser);
+router.post("/login", loginUser);
+router.get("/user", authUser, searchUser);
 
-  try {
-    // step 1: validate the data
-    if (email.length < 1) {
-      res.status(404);
-      res.send("Please enter email!");
-      return;
-    }
-    if (password.length < 1) {
-      res.status(404);
-      res.send("Please enter password!");
-      return;
-    }
-
-    // step 2 : find the user in the db if that email exists
-    let user = await User.findOne({ email: email });
-
-    if (!user) {
-      res.status(404);
-      res.send("Email id not found!");
-      return;
-    }
-
-    // step 3 : if email id is present then check the password
-    let isPasswordMatched = await bcrypt.compare(password, user.password);
-
-    // step 4 : if password is correct then authenicate the user otherwise send the error msg
-    if (isPasswordMatched) {
-      res.status(200);
-      res.send("Login Successfull!");
-    } else {
-      res.status(404);
-      res.send("Incorrect Password! Please check it again");
-    }
-  } catch (err) {
-    res.status(404);
-    res.send("Something went wrong!");
-  }
-});
-
-router.post("/sign-up", async (req, res) => {
-  let { firstName, lastName, email, password } = req.body;
-
-  try {
-    if (firstName.length < 1) {
-      res.status(404);
-      res.send("Please enter first name");
-      return;
-    }
-    if (lastName.length < 1) {
-      res.status(404);
-      res.send("Please enter last name");
-      return;
-    }
-    if (email.length < 1) {
-      res.status(404);
-      res.send("Please enter email name");
-      return;
-    }
-    if (password.length < 1) {
-      res.status(404);
-      res.send("Please enter password name");
-      return;
-    }
-
-    let isEmailIdExists = await User.findOne({ email: email });
-
-    if (isEmailIdExists) {
-      console.log("email already exists", isEmailIdExists);
-      res.status(404);
-      res.send("Email Id already exists! Create new one.");
-      return;
-    }
-
-    const userData = new User({
-      firstName,
-      lastName,
-      email,
-      password,
-    });
-
-    const hash = await bcrypt.hash(password, 10);
-    userData.password = hash;
-
-    userData
-      .save()
-      .then(() => {
-        res.status(200);
-        res.send("Data Saved!");
-      })
-      .catch((err) => {
-        res.status(404);
-        res.send("Something went wrong!");
-      });
-  } catch (err) {
-    res.status(404);
-    res.send("Something went wrong!");
-  }
-});
-
-module.exports = router
+module.exports = router;
