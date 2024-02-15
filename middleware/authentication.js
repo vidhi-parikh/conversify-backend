@@ -3,7 +3,6 @@ const User = require("../models/userModel");
 
 const authUser = async (req, res, next) => {
   try {
-    console.log('req.body',req.body)
     let token = req.headers?.authorization;
     if (token) {
       token = token.split(" ")[1];
@@ -11,7 +10,6 @@ const authUser = async (req, res, next) => {
       let isValidUser = await User.find({id: decoded.id});
       if (isValidUser) {
         req.userId = decoded.id;
-        console.log(req.userId)
         next();
       } else res.send("Unauthorized User!");
     } else {
