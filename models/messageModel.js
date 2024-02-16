@@ -10,6 +10,6 @@ const messageSchema = mongoose.Schema({
   }
 );
 
-const Message = mongoose.Model("Message", messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 
 module.exports = Message;
