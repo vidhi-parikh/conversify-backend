@@ -6,7 +6,7 @@ const user_router = require("./routes/user_route")
 const chat_router = require("./routes/chat_route")
 const message_router = require("./routes/message_route")
 const {notFound,errorHandler} = require('./middleware/errorMiddlewares')
-const PORT = 4000;
+const PORT = process.env.PORT || 4000
 const dotenv = require("dotenv");
 dotenv.config({
   path: './.env'
